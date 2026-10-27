@@ -1,0 +1,8 @@
+{
+  "objects": 98,
+  "lights": 16,
+  "materials": 17,
+  "triangles": 2104,
+  "budget_triangles_max": 150000,
+  "within_budget": true
+}

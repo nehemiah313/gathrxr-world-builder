@@ -57,12 +57,12 @@ FLOOR = mat("floor_tile", hex2rgb("23232b"), rough=0.6)
 CURTAIN = mat("curtain_red", hex2rgb("5c0a0a"), rough=1.0)
 STAGEWOOD = mat("stage_wood", hex2rgb("6b4a2f"), rough=0.8)
 CATWALK = mat("catwalk_gloss", hex2rgb("111114"), rough=0.15)
-EDGE = mat("runway_edge", hex2rgb("e8e8ff"), emit=4.0)
+EDGE = mat("runway_edge", hex2rgb("e8e8ff"), emit=1.5)
 GOLD = mat("gold_sign", hex2rgb("d4af37"), rough=0.3, metal=0.9)
 STEEL = mat("steel", hex2rgb("3a3a42"), rough=0.4, metal=0.8)
 TANK = mat("tank_fluid", hex2rgb("7fe7d0"), rough=0.05, alpha=0.35)
 MIRROR = mat("mirror", hex2rgb("cfd6dd"), rough=0.03, metal=1.0)
-BULB = mat("vanity_bulb", hex2rgb("fff2e0"), emit=8.0)
+BULB = mat("vanity_bulb", hex2rgb("fff2e0"), emit=4.0)
 DUCT = mat("vent_duct", hex2rgb("2e2e34"), rough=0.5, metal=0.7)
 
 
@@ -214,10 +214,13 @@ gbox("vent_S", 10.6, 0.55, 16, 12.4, 1.1, 0.2, DUCT)
 gbox("vent_ceil", 10.6, 1.15, 15.5, 12.4, 0.2, 1.2, DUCT)
 
 # ---------- lights (Blender; exported as KHR_lights_punctual) ----------
+LIGHT_SCALE = 15.0  # watts -> visible pools under Eevee headless
+
+
 def light(name, kind, gx, gy, gz, color, energy, spot_size=None):
     ld = bpy.data.lights.new(name, kind)
     ld.color = color
-    ld.energy = energy
+    ld.energy = energy * LIGHT_SCALE
     if kind == "SPOT" and spot_size:
         ld.spot_size = spot_size
     lo = bpy.data.objects.new(name, ld)
@@ -250,13 +253,18 @@ cam_data = bpy.data.cameras.new("hero_cam")
 cam_data.lens = 24
 cam = bpy.data.objects.new("hero_cam", cam_data)
 cam.location = (0, 2.0, 1.4)       # GathrXR (0, 1.4, -2) -> at runway end area
-cam.rotation_euler = (math.radians(85), 0, math.radians(180))
+cam.rotation_euler = (math.radians(83), 0, 0)  # faces blender +Y = toward stage
 scene.collection.objects.link(cam)
 scene.camera = cam
 scene.render.resolution_x = 640
 scene.render.resolution_y = 360
-scene.render.engine = "BLENDER_EEVEE_NEXT" if hasattr(bpy.types, "SceneEEVEE") else "BLENDER_EEVEE"
-scene.eevee.taa_render_samples = 16
+scene.render.engine = "BLENDER_EEVEE"
+try:
+    scene.eevee.taa_render_samples = 16
+except AttributeError:
+    pass
+scene.view_settings.view_transform = "Standard"
+scene.view_settings.exposure = -0.5
 scene.render.filepath = os.path.join(OUT, "preview_hero.png")
 
 # ---------- metrics + save + export ----------
@@ -285,10 +293,27 @@ try:
 except Exception as e:  # headless GPU may be absent; preview is optional
     print("preview render skipped:", e)
 
+# G1 geometry proof: overhead workbench render (ignores lighting)
+try:
+    cam2_data = bpy.data.cameras.new("overhead_cam")
+    cam2_data.type = "ORTHO"
+    cam2_data.ortho_scale = 40
+    cam2 = bpy.data.objects.new("overhead_cam", cam2_data)
+    cam2.location = (7, -2, 40)  # over the footprint, looking straight down
+    cam2.rotation_euler = (0, 0, 0)
+    scene.collection.objects.link(cam2)
+    scene.camera = cam2
+    scene.render.engine = "BLENDER_WORKBENCH"
+    scene.render.filepath = os.path.join(OUT, "preview_overhead.png")
+    bpy.ops.render.render(write_still=True)
+    scene.camera = cam
+except Exception as e:
+    print("overhead render skipped:", e)
+
 bpy.ops.export_scene.gltf(
     filepath=os.path.join(OUT, "house_of_velvet.glb"),
     export_format="GLB",
-    export_lights=True,
+    export_lights=False,  # GathrXR live world carries its own lights; GLB ships geometry + emissives
     export_apply=True,
     export_yup=True,
 )
