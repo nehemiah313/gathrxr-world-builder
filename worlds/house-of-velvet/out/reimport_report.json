@@ -1,6 +1,7 @@
 {
-  "reimport_meshes": 98,
-  "reimport_materials": 17,
-  "reimport_triangles": 2104,
+  "reimport_meshes": 191,
+  "reimport_materials": 29,
+  "reimport_triangles": 23780,
+  "glb_bytes": 1626588,
   "status": "PASS"
 }

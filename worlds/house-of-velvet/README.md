@@ -8,10 +8,10 @@ This directory continues the live GathrXR primitive build through this repo's SK
 
 | Gate | Status |
 |---|---|
-| G1 architecture | blockout script written, pending headless run |
-| G2 composition | pending |
-| G3 appearance | pending |
-| G4 performance/export | pending |
+| G1 architecture | PASS (98-object blockout, GLB reimport PASS) |
+| G2 composition | PASS (detail pass: truss + par-cans, chandelier, footlights, runway dot-lights, cove strips, tank silhouettes, draped couture, debris, sconces, moon shaft) |
+| G3 appearance | partial (beveled edges, PBR variety, emissives, night-ambient world; next: image textures / baked lightmaps) |
+| G4 performance/export | PASS at blockout scale (191 meshes, 29 materials, 23,780 tris of 150k budget, GLB 1.6MB, reimport PASS); headset test still required |
 
 - Live playable world (primitive build, 124 objects): GathrXR world `6edf4e41-e136-49da-acdf-2ed6d07d44ca`
 - Spec: `world_spec.json`

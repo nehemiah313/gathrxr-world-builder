@@ -92,8 +92,8 @@ def gbox(name, gx, gy, gz, sx, sy, sz, material, rot_x=0.0):
     return box(name, gx, -gz, gy, sx, sz, sy, material, rot=rot)  # note axis swap
 
 
-def gcyl(name, gx, gy, gz, r, h, material):
-    return cyl(name, gx, -gz, gy, r, h, material)
+def gcyl(name, gx, gy, gz, r, h, material, verts=12):
+    return cyl(name, gx, -gz, gy, r, h, material, verts=verts)
 
 
 H = 4.0  # wall height
@@ -248,6 +248,119 @@ light("lab_green", "POINT", 13.5, 7.5, 6, hex2rgb("4dff9d"), 150)
 light("lab_moon", "SPOT", 13.3, 8.5, 5.5, hex2rgb("bcd4ff"), 700, spot_size=1.2)
 light("dir_gold", "POINT", 21, 7, 14.5, hex2rgb("ffd27a"), 80)
 
+# ================= G2/G3 DETAIL + POLISH PASS =================
+# New materials for the detail layer
+BRASS = mat("brass", hex2rgb("b8933f"), rough=0.35, metal=0.9)
+CHROME = mat("chrome", hex2rgb("c9ced6"), rough=0.1, metal=1.0)
+FABRIC_RED = mat("fabric_red", hex2rgb("6e1414"), rough=1.0)
+FABRIC_IVORY = mat("fabric_ivory", hex2rgb("d8d0bd"), rough=1.0)
+FABRIC_CRIMSON = mat("fabric_crimson", hex2rgb("4a0d10"), rough=1.0)
+SILHOUETTE = mat("tank_silhouette", hex2rgb("0a1a17"), rough=0.9, alpha=0.9)
+COVE = mat("cove_cyan", hex2rgb("5577aa"), emit=2.0)
+WARM = mat("sconce_warm", hex2rgb("ffcf8a"), emit=5.0)
+REDLENS = mat("par_red", hex2rgb("ff2a2a"), emit=6.0)
+WHITELENS = mat("par_white", hex2rgb("fff4e0"), emit=6.0)
+GREENLENS = mat("lab_lens", hex2rgb("4dff9d"), emit=5.0)
+MOONSHAFT = mat("moon_shaft", hex2rgb("aec4ff"), emit=0.6, alpha=0.06)
+DEBRIS = mat("debris", hex2rgb("17171d"), rough=1.0)
+
+# --- stage lighting truss + par cans ---
+gbox("truss_beam", 0, 3.85, -11.2, 9, 0.18, 0.18, CHROME)
+gbox("truss_beam_front", 0, 3.85, -9.6, 9, 0.18, 0.18, CHROME)
+for i, tx in enumerate([-3.4, -1.7, 0, 1.7, 3.4]):
+    gcyl(f"parcan_{i}", tx, 3.6, -11.2, 0.14, 0.4, STEEL)
+    lens = REDLENS if i % 2 == 0 else WHITELENS
+    gcyl(f"parlens_{i}", tx, 3.38, -11.2, 0.12, 0.05, lens)
+
+# --- chandelier over showroom ---
+gcyl("chand_ring", 0, 3.6, -5, 0.9, 0.08, BRASS, verts=20)
+gcyl("chand_stem", 0, 3.85, -5, 0.03, 0.5, BRASS)
+import math as _m
+for i in range(10):
+    a = i / 10.0 * 2 * _m.pi
+    bx, bz = 0.8 * _m.cos(a), -5 + 0.8 * _m.sin(a)
+    gcyl(f"chand_bead_{i}", bx, 3.35, bz, 0.05, 0.12, WARM)
+
+# --- stage footlights (row of warm domes at stage front) ---
+for i in range(9):
+    gcyl(f"footlight_{i}", -3.6 + i * 0.9, 0.82, -10.35, 0.07, 0.1, WARM)
+
+# --- runway edge dot-lights ---
+for i in range(10):
+    z = -3.2 - i * 0.72
+    gcyl(f"runway_dot_L_{i}", -1.2, 0.62, z, 0.05, 0.06, WHITELENS)
+    gcyl(f"runway_dot_R_{i}", 1.2, 0.62, z, 0.05, 0.06, WHITELENS)
+
+# --- showroom cove lighting (thin emissive strips near ceiling) ---
+gbox("cove_N", 0, 3.9, -13.9, 18, 0.06, 0.1, COVE)
+gbox("cove_W", -9.9, 3.9, -7, 0.1, 0.06, 13, COVE)
+gbox("cove_E", 9.9, 3.9, -7, 0.1, 0.06, 13, COVE)
+
+# --- wall sconces down the halls (warm pinpoints) ---
+for z in (3, 6, 10, 13):
+    gbox(f"sconce_W_{z}", -5.0, 2.6, z, 0.08, 0.3, 0.08, WARM)
+    gbox(f"sconce_E_{z}", 5.0, 2.6, z, 0.08, 0.3, 0.08, WARM)
+
+# --- specimen tank silhouettes (a gown-body suspended in each tank) ---
+for i, (tx, tz) in enumerate([(12, 4.5), (14.5, 4.5), (12, 7.5)], 1):
+    gcyl(f"tank_body_{i}", tx, 6.3, tz, 0.22, 1.6, SILHOUETTE, verts=10)
+    gcyl(f"tank_head_{i}", tx, 7.2, tz, 0.14, 0.3, SILHOUETTE, verts=10)
+    gcyl(f"tank_ring_{i}", tx, 4.65, tz, 0.6, 0.08, BRASS, verts=16)
+
+# --- draped couture on mannequins + catwalk (angled fabric planes) ---
+gbox("drape_mann_1", 15.5, 0.9, -8.8, 0.9, 1.6, 0.05, FABRIC_CRIMSON, rot_x=0.12)
+gbox("drape_mann_2", 15.5, 0.9, -3.2, 0.9, 1.6, 0.05, FABRIC_IVORY, rot_x=-0.1)
+gbox("drape_catwalk", 0.3, 0.65, -4.5, 0.8, 0.05, 1.4, FABRIC_CRIMSON, rot_x=0.0)
+gbox("drape_floor_show", -4.5, 0.08, -5, 1.6, 0.04, 1.2, FABRIC_CRIMSON)
+
+# --- curtain vertical folds (relief over the flat curtain) ---
+for i in range(9):
+    fx = -4 + i * 1.0
+    gbox(f"curtain_fold_{i}", fx, 2.2, -13.68, 0.12, 3.0, 0.12, mat("curtain_fold", hex2rgb("4a0808"), rough=1.0))
+
+# --- debris in halls (fallen clutter) ---
+for nm, (dx, dy, dz, s, rx) in {
+    "debris_1": (-3.0, 0.15, 4, 0.5, 0.0),
+    "debris_2": (3.2, 0.1, 9, 0.4, 0.3),
+    "debris_3": (-2.6, 0.2, 11, 0.6, 0.6),
+    "debris_4": (13.0, 0.15, 1.5, 0.5, 0.0),
+}.items():
+    gbox(nm, dx, dy, dz, s, s * 0.6, s, DEBRIS, rot_x=rx)
+
+# --- director desk lamp glow + gold plate ---
+gcyl("dir_lamp", 21.6, 5.55, 14.6, 0.06, 0.18, WARM)
+gbox("dir_plate", 21, 5.95, 17.7, 1.6, 0.5, 0.06, BRASS)
+
+# --- fake volumetric moon shaft (big faint translucent cone from the roof hole) ---
+bpy.ops.mesh.primitive_cone_add(vertices=24, radius1=2.6, radius2=0.5,
+                                depth=5.0, location=(0, 7, 4.0))
+_shaft = bpy.context.active_object
+_shaft.name = "moon_shaft"
+_shaft.data.materials.append(MOONSHAFT)
+
+# --- BEVEL PASS: round every hard box/cylinder edge (kills the flat-blockout look) ---
+_meshes = [o for o in bpy.data.objects if o.type == "MESH"]
+for o in _meshes:
+    md = o.modifiers.new("bev", "BEVEL")
+    md.width = 0.012
+    md.segments = 2
+    md.limit_method = "ANGLE"
+    md.angle_limit = math.radians(50)
+    bpy.context.view_layer.objects.active = o
+    try:
+        bpy.ops.object.modifier_apply(modifier="bev")
+    except Exception as e:
+        o.modifiers.remove(md)
+
+# --- dark-blue world ambient so shadows read as night, not void ---
+world = bpy.data.worlds.new("night")
+world.use_nodes = True
+bg = world.node_tree.nodes.get("Background")
+if bg:
+    bg.inputs["Color"].default_value = (0.012, 0.014, 0.03, 1.0)
+    bg.inputs["Strength"].default_value = 1.0
+scene.world = world
+
 # ---------- hero camera (G1 preview) ----------
 cam_data = bpy.data.cameras.new("hero_cam")
 cam_data.lens = 24
@@ -309,6 +422,22 @@ try:
     scene.camera = cam
 except Exception as e:
     print("overhead render skipped:", e)
+
+# Gallery angle: backstage looking at the bright makeup room vs dark cold storage
+try:
+    scene.render.engine = "BLENDER_EEVEE"
+    cam3_data = bpy.data.cameras.new("makeup_cam")
+    cam3_data.lens = 22
+    cam3 = bpy.data.objects.new("makeup_cam", cam3_data)
+    cam3.location = (19, 6.2, 1.7)   # makeup room center, GathrXR ~ (19, 1.7, -6.2)
+    cam3.rotation_euler = (math.radians(84), 0, 0)  # faces the mirror/vanity wall
+    scene.collection.objects.link(cam3)
+    scene.camera = cam3
+    scene.render.filepath = os.path.join(OUT, "preview_makeup.png")
+    bpy.ops.render.render(write_still=True)
+    scene.camera = cam
+except Exception as e:
+    print("makeup render skipped:", e)
 
 bpy.ops.export_scene.gltf(
     filepath=os.path.join(OUT, "house_of_velvet.glb"),
