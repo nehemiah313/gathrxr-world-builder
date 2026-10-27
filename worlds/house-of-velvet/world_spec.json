@@ -1,0 +1,57 @@
+{
+  "world": {
+    "name": "House of Velvet",
+    "ip": "5 Nights at Velvet's (original IP, Neo / Cosmic Funk Studios)",
+    "concept": "Condemned 1980s fashion house. Undead runway models (thin, thick, BBW) still walk the catwalk after midnight. Spielberg-restraint horror: light does the storytelling.",
+    "gathrxr_world_id": "6edf4e41-e136-49da-acdf-2ed6d07d44ca",
+    "units": "meters",
+    "up_axis": "Y (GathrXR) / Z (Blender authoring, converted on GLB export with +Y up)"
+  },
+  "references": [
+    "house-models-keyart-9x16.png (runway trio, moonbeam, flashbulbs)",
+    "volta-makeup-room-16x9.png (overexposed vanity room vs black doorway)",
+    "atelier-lab-16x9.png (specimen tanks, dress forms, green glow, open storm sky)"
+  ],
+  "dimensions": {
+    "ground_footprint": {"x": [-10.4, 24.0], "z": [-14.4, 18.4]},
+    "wall_height": 4.0,
+    "level2_floor_y": 4.6,
+    "vent_clearance": 1.05,
+    "catwalk": {"width": 2.4, "length": 7.4, "height": 0.6}
+  },
+  "zones": [
+    {"id": "showroom", "x": [-10, 10], "z": [-14, 0], "notes": "stage, torn curtain, runway catwalk, party tables, collapsed-roof moon hole over catwalk end"},
+    {"id": "halls", "x": [-5.2, 5.2], "z": [0, 14], "notes": "two 2.6m corridors split by divider block; closet off west hall z 6..8.6"},
+    {"id": "security_office", "x": [-4.2, 4.2], "z": [14, 18.2], "notes": "player spawn; desk, CRT monitors, 12:00 AM clock; vent exit east wall y<1"},
+    {"id": "backstage", "x": [10.2, 17], "z": [-10.4, 4], "notes": "wardrobe racks, mannequins, freight gate south (barred)"},
+    {"id": "makeup_room", "x": [17, 23.8], "z": [-10.4, -4.3], "notes": "LIGHT zone: overexposed vanity, mirror wall"},
+    {"id": "cold_storage", "x": [17, 23.8], "z": [-4.3, -0.2], "notes": "DARK zone: zero lights"},
+    {"id": "stair_lobby", "x": [16.8, 23.8], "z": [0, 12.2], "notes": "service ramp to level 2, red indicator at top, lab gate half-open"},
+    {"id": "atelier_lab", "x": [10, 17.5], "z": [2, 10], "level": 2, "notes": "3 specimen tanks, steel table, dress forms thin/curvy/grand, green + moonlight, open to storm sky"},
+    {"id": "director_office", "x": [17.5, 24], "z": [10, 18], "level": 2, "notes": "desk, gold lamp, DIRECTOR sign"}
+  ],
+  "characters": {
+    "seraphine": {"body": "thin", "height_m": 1.88, "look": "gray-green skin, sunken cheeks, torn black chiffon + gold thread, milky eyes, perfect posture", "post": "catwalk end under moonbeam"},
+    "madame_volta": {"body": "thick/curvy", "height_m": 1.75, "look": "decayed crimson velvet gown, opera gloves, beehive with moths, commanding stare", "post": "makeup room mirror"},
+    "duchess_pearl": {"body": "BBW", "height_m": 1.7, "look": "pearl-encrusted decaying ivory ballgown, cracked porcelain makeup, regal, slow", "post": "cold storage"}
+  },
+  "materials": {
+    "palette": ["#16161c walls", "#5c0a0a curtain", "#d4af37 gold signage", "#7fe7d0 tank fluid", "#111114 catwalk gloss"],
+    "pbr_notes": "GLB-safe principled BSDF only; emissive strips for runway edges and vanity bulbs; no Blender-only shaders"
+  },
+  "budget": {
+    "triangles_max": 150000,
+    "materials_max": 24,
+    "texture_memory_mb_max": 64,
+    "glb_size_mb_max": 50,
+    "status": "provisional (no measured GathrXR runtime budget yet)"
+  },
+  "camera_reference": {"hero": "low angle from runway end looking toward stage, moonbeam key, red stage rim"},
+  "assumptions": [
+    "GathrXR importer accepts +Y-up GLB <= 200MB via public URL or manual upload",
+    "Collision handled by GathrXR per-object collidable flag; export separate _COL meshes only if runtime supports them",
+    "Primitive-built live world remains the playable version until GLB passes G4 and headset test"
+  ],
+  "gates": {"G1": "pending", "G2": "pending", "G3": "pending", "G4": "pending"},
+  "runtime_testing": "NOT performed; required before claiming WebXR readiness"
+}
