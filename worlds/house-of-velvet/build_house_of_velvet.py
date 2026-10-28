@@ -107,12 +107,12 @@ AT_BEAM = mat("atelier_beam", "0d2419", rough=1.0)
 GLASS = mat("tank_glass", "7fe7d0", rough=0.03, alpha=0.22)
 BRASS = mat("brass_green", "6d6a3c", rough=0.3, metal=0.9)
 COPPER = mat("copper_pipe", "5e5536", rough=0.35, metal=0.9)
-GOWN_GLOW = mat("gown_glow", "b9ffe4", emit=9.0)
+GOWN_GLOW = mat("gown_glow", "b9ffe4", emit=3.2)
 FORM = mat("dress_form", "1b3a2c", rough=0.95)
 GOWN_PALE = mat("gown_pale", "9fe6c4", rough=1.0)
-ARCH_BLAZE = mat("arch_blaze", "49ff9d", emit=20.0)
+ARCH_BLAZE = mat("arch_blaze", "49ff9d", emit=6.5)
 BONE = mat("skeleton", "0a1410", rough=0.9)
-GLASSTABLE = mat("glass_table", "8fffd8", emit=3.0, alpha=0.5)
+GLASSTABLE = mat("glass_table", "8fffd8", emit=1.4, alpha=0.5)
 
 STEEL = mat("steel", "2b3034", rough=0.4, metal=0.8)
 DEBRIS = mat("debris", "0c1014", rough=1.0)
@@ -420,7 +420,8 @@ join_group("arch_skeleton", _skel)
 # Same room, upside down: tanks hang from the ceiling, light grows upward.
 IV_FLOOR = L2 + 4.4      # what reads as "ceiling" here is the inverted room's floor
 gbox("iv_ceil", 20.8, IV_FLOOR, 6.0, 6.4, 0.3, 8.4, AT_WALL)
-gbox("iv_floor_glow", 20.8, L2 - 0.1, 6.0, 6.4, 0.12, 8.4, ARCH_BLAZE)   # light from below
+gbox("iv_floor_glow", 20.8, L2 - 0.1, 6.0, 6.4, 0.12, 8.4,
+     mat("iv_floor_glow_m", "3ad98a", emit=2.2))   # light from below
 gbox("iv_wall_N", 20.8, L2 + 2.2, 1.9, 6.4, 4.4, 0.3, AT_WALL)
 gbox("iv_wall_S", 20.8, L2 + 2.2, 10.1, 6.4, 4.4, 0.3, AT_WALL)
 gbox("iv_wall_E", 23.9, L2 + 2.2, 6.0, 0.3, 4.4, 8.4, AT_WALL)
@@ -485,12 +486,64 @@ light("gate_plum", "POINT", 13.8, 3, 5.5, "8a46d6", 45)
 # makeup: sourceless white
 light("makeup_sourceless", "AREA", 20.4, 3.7, -7.3, "ffffff", 900)
 # atelier: single green world + the moon reaching in
-light("atelier_green", "POINT", 13.3, L2 + 2.0, 5.5, "4dff9d", 220)
-light("atelier_green2", "POINT", 12.0, L2 + 1.6, 8.5, "4dff9d", 130)
+light("atelier_green", "POINT", 13.3, L2 + 2.0, 5.5, "4dff9d", 70)
+light("atelier_green2", "POINT", 12.0, L2 + 1.6, 8.5, "4dff9d", 45)
 light("atelier_moon", "SPOT", 13.0, L2 + 5.4, 5.0, "cdddff", 520, spot_size=1.1)
-light("arch_blaze_l", "POINT", 17.6, L2 + 1.6, 6.0, "49ff9d", 420)
-light("inverted_updraft", "POINT", 20.8, L2 + 0.6, 6.0, "49ff9d", 300)
+light("arch_blaze_l", "POINT", 17.6, L2 + 1.6, 6.0, "49ff9d", 120)
+light("inverted_updraft", "POINT", 20.8, L2 + 0.6, 6.0, "49ff9d", 95)
 light("dir_gold", "POINT", 21, L2 + 2.4, 14.5, "ffcf87", 70)
+
+
+# ===================== THE HOUSE MODELS (key art subject) ======================
+GOWN_BLACK = mat("gown_black", "0b0b0e", rough=0.55)
+GOLD_THREAD = mat("gold_thread", "c8a24a", emit=1.6, metal=0.8, rough=0.3)
+GOWN_CRIMSON = mat("gown_crimson", "5a1218", rough=1.0)
+GOWN_IVORY = mat("gown_ivory", "d8cfbd", rough=0.9)
+SKIN = mat("model_skin", "707c74", rough=0.72)
+HAIR = mat("model_hair", "241610", rough=1.0)
+PEARL = mat("pearl_trim", "efe8d8", rough=0.35)
+
+RW = 0.18   # runway top
+
+
+def model(tag, gx, gz, height, hip, gown_mat, hair_mat, hair_r, trim=None):
+    """Stylised walking figure: gown cone, torso, arms, head, hair."""
+    parts = []
+    gown_h = height * 0.55
+    parts.append(gcone(f"{tag}_gown", gx, RW + gown_h / 2, gz, hip, hip * 0.33,
+                       gown_h, gown_mat, verts=16))
+    parts.append(gcyl(f"{tag}_torso", gx, RW + gown_h + height * 0.16, gz,
+                      hip * 0.42, height * 0.33, gown_mat, verts=12))
+    parts.append(gcyl(f"{tag}_neck", gx, RW + height * 0.885, gz, 0.045,
+                      height * 0.07, SKIN, verts=8))
+    parts.append(gsph(f"{tag}_head", gx, RW + height * 0.945, gz, height * 0.055,
+                      SKIN, segs=12))
+    parts.append(gsph(f"{tag}_hair", gx, RW + height * 0.985, gz, hair_r,
+                      hair_mat, segs=12))
+    for sgn in (-1, 1):
+        parts.append(gcyl(f"{tag}_arm{sgn}", gx + sgn * (hip * 0.5), RW + height * 0.6,
+                          gz + 0.04, 0.035, height * 0.42, SKIN, verts=8,
+                          rot_x=sgn * 0.07))
+    if trim:
+        for i in range(4):
+            parts.append(gcyl(f"{tag}_trim{i}", gx - hip * 0.6 + i * hip * 0.4,
+                              RW + gown_h * 0.55, gz - hip * 0.2, 0.012,
+                              gown_h * 0.8, trim, verts=6))
+    return parts
+
+
+_m = []
+# Seraphine: thin, tall, torn black chiffon with gold thread (leads, nearest camera)
+_m += model("seraphine", 0.0, -8.6, 1.95, 0.46, GOWN_BLACK, HAIR, 0.055, trim=GOLD_THREAD)
+# Madame Volta: curvy, crimson velvet, towering beehive
+_m += model("volta", -1.02, -10.9, 1.78, 0.62, GOWN_CRIMSON, HAIR, 0.165)
+# Duchess Pearl: grand, pearl-encrusted ivory
+_m += model("pearl", 1.05, -10.7, 1.76, 0.78, GOWN_IVORY, HAIR, 0.125, trim=PEARL)
+join_group("house_models", _m)
+
+# a soft key so the lead model is actually lit, as in the art
+light("model_key", "SPOT", 0.0, 6.2, -8.0, "cfe0ff", 520, spot_size=0.75)
+light("model_fill", "POINT", 0.0, 1.5, -6.6, "ffe8bc", 26)
 
 # ===================== BEVEL PASS ==============================================
 for o in [o for o in bpy.data.objects if o.type == "MESH"]:
@@ -523,7 +576,7 @@ try:
 except AttributeError:
     pass
 scene.view_settings.view_transform = "Standard"
-scene.view_settings.exposure = -0.95
+scene.view_settings.exposure = -0.75
 
 
 def add_cam(name, gx, gy, gz, lens, pitch_deg, yaw_deg=0.0, vertical=False):
@@ -538,8 +591,8 @@ def add_cam(name, gx, gy, gz, lens, pitch_deg, yaw_deg=0.0, vertical=False):
 
 # hero: match the key art. Standing on the runway, low, looking up its length.
 cam_hero = add_cam("cam_hero", 0, 1.45, -3.6, 20, 95, 0)
-cam_atelier = add_cam("cam_atelier", 11.0, L2 + 1.75, 8.9, 22, 86, -58)
-cam_inverted = add_cam("cam_inverted", 18.4, L2 + 1.9, 6.0, 20, 90, -90)
+cam_atelier = add_cam("cam_atelier", 9.6, L2 + 2.25, 10.6, 17, 84, -46)
+cam_inverted = add_cam("cam_inverted", 17.0, L2 + 2.0, 6.0, 16, 90, -90)
 
 tri_count = 0
 for o in bpy.data.objects:
@@ -563,11 +616,12 @@ with open(os.path.join(OUT, "metrics.json"), "w") as f:
 
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, "house_of_velvet.blend"))
 
-for cam, fname, rx, ry in [(cam_hero, "preview_hero.png", 540, 960),
-                           (cam_atelier, "preview_atelier.png", 768, 432),
-                           (cam_inverted, "preview_inverted.png", 768, 432)]:
+for cam, fname, rx, ry, expo in [(cam_hero, "preview_hero.png", 540, 960, -0.75),
+                                 (cam_atelier, "preview_atelier.png", 768, 432, -1.9),
+                                 (cam_inverted, "preview_inverted.png", 768, 432, -2.1)]:
     scene.camera = cam
     scene.render.resolution_x, scene.render.resolution_y = rx, ry
+    scene.view_settings.exposure = expo
     scene.render.filepath = os.path.join(OUT, fname)
     try:
         bpy.ops.render.render(write_still=True)
