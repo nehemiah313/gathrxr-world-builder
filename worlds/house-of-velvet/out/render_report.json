@@ -1,0 +1,11 @@
+{
+  "objects": 107,
+  "triangles": 110372,
+  "materials": 42,
+  "glb_bytes": 7776972,
+  "rendered": [
+    "preview_atelier.png",
+    "preview_hero.png",
+    "preview_inverted.png"
+  ]
+}

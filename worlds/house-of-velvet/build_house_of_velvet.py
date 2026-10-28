@@ -507,43 +507,48 @@ RW = 0.18   # runway top
 
 
 def model(tag, gx, gz, height, hip, gown_mat, hair_mat, hair_r, trim=None):
-    """Stylised walking figure: gown cone, torso, arms, head, hair."""
+    """Stylised walking figure. Narrow silhouette: couture reads tall, not conical."""
     parts = []
-    gown_h = height * 0.55
-    parts.append(gcone(f"{tag}_gown", gx, RW + gown_h / 2, gz, hip, hip * 0.33,
-                       gown_h, gown_mat, verts=16))
-    parts.append(gcyl(f"{tag}_torso", gx, RW + gown_h + height * 0.16, gz,
-                      hip * 0.42, height * 0.33, gown_mat, verts=12))
-    parts.append(gcyl(f"{tag}_neck", gx, RW + height * 0.885, gz, 0.045,
-                      height * 0.07, SKIN, verts=8))
-    parts.append(gsph(f"{tag}_head", gx, RW + height * 0.945, gz, height * 0.055,
-                      SKIN, segs=12))
-    parts.append(gsph(f"{tag}_hair", gx, RW + height * 0.985, gz, hair_r,
-                      hair_mat, segs=12))
+    gown_h = height * 0.50
+    # skirt: narrow at the hem, not a traffic cone
+    parts.append(gcone(f"{tag}_gown", gx, RW + gown_h / 2, gz, hip, hip * 0.52,
+                       gown_h, gown_mat, verts=18))
+    # long bodice
+    parts.append(gcyl(f"{tag}_torso", gx, RW + gown_h + height * 0.17, gz,
+                      hip * 0.50, height * 0.34, gown_mat, verts=14))
+    # shoulders
+    parts.append(gbox(f"{tag}_shoulders", gx, RW + height * 0.80, gz,
+                      hip * 1.15, height * 0.045, hip * 0.62, gown_mat))
+    parts.append(gcyl(f"{tag}_neck", gx, RW + height * 0.845, gz, 0.052,
+                      height * 0.075, SKIN, verts=8))
+    parts.append(gsph(f"{tag}_head", gx, RW + height * 0.925, gz, height * 0.072,
+                      SKIN, segs=14))
+    parts.append(gsph(f"{tag}_hair", gx, RW + height * 0.962, gz, hair_r,
+                      hair_mat, segs=14))
     for sgn in (-1, 1):
-        parts.append(gcyl(f"{tag}_arm{sgn}", gx + sgn * (hip * 0.5), RW + height * 0.6,
-                          gz + 0.04, 0.035, height * 0.42, SKIN, verts=8,
-                          rot_x=sgn * 0.07))
+        parts.append(gcyl(f"{tag}_arm{sgn}", gx + sgn * (hip * 0.92), RW + height * 0.58,
+                          gz + 0.03, 0.036, height * 0.40, SKIN, verts=8,
+                          rot_x=sgn * 0.05))
     if trim:
-        for i in range(4):
-            parts.append(gcyl(f"{tag}_trim{i}", gx - hip * 0.6 + i * hip * 0.4,
-                              RW + gown_h * 0.55, gz - hip * 0.2, 0.012,
-                              gown_h * 0.8, trim, verts=6))
+        for i in range(5):
+            parts.append(gcyl(f"{tag}_trim{i}", gx - hip * 0.62 + i * hip * 0.31,
+                              RW + gown_h * 0.52, gz - hip * 0.30, 0.009,
+                              gown_h * 0.86, trim, verts=6))
     return parts
 
 
 _m = []
 # Seraphine: thin, tall, torn black chiffon with gold thread (leads, nearest camera)
-_m += model("seraphine", 0.0, -8.6, 1.95, 0.46, GOWN_BLACK, HAIR, 0.055, trim=GOLD_THREAD)
+_m += model("seraphine", 0.0, -8.6, 1.95, 0.21, GOWN_BLACK, HAIR, 0.055, trim=GOLD_THREAD)
 # Madame Volta: curvy, crimson velvet, towering beehive
-_m += model("volta", -1.02, -10.9, 1.78, 0.62, GOWN_CRIMSON, HAIR, 0.165)
+_m += model("volta", -1.06, -10.9, 1.78, 0.30, GOWN_CRIMSON, HAIR, 0.145)
 # Duchess Pearl: grand, pearl-encrusted ivory
-_m += model("pearl", 1.05, -10.7, 1.76, 0.78, GOWN_IVORY, HAIR, 0.125, trim=PEARL)
+_m += model("pearl", 1.08, -10.7, 1.76, 0.37, GOWN_IVORY, HAIR, 0.115, trim=PEARL)
 join_group("house_models", _m)
 
 # a soft key so the lead model is actually lit, as in the art
-light("model_key", "SPOT", 0.0, 6.2, -8.0, "cfe0ff", 520, spot_size=0.75)
-light("model_fill", "POINT", 0.0, 1.5, -6.6, "ffe8bc", 26)
+light("model_key", "SPOT", 0.0, 6.2, -8.4, "cfe0ff", 95, spot_size=0.55)
+light("model_fill", "POINT", 0.0, 1.9, -6.2, "ffe8bc", 5)
 
 # ===================== BEVEL PASS ==============================================
 for o in [o for o in bpy.data.objects if o.type == "MESH"]:
