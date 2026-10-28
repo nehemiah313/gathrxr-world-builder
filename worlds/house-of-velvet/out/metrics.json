@@ -1,8 +1,18 @@
 {
-  "objects": 191,
-  "lights": 16,
-  "materials": 31,
-  "triangles": 23780,
+  "objects": 106,
+  "lights": 19,
+  "materials": 35,
+  "triangles": 99688,
   "budget_triangles_max": 150000,
-  "within_budget": true
+  "within_budget": true,
+  "reference_matched": [
+    "house-models-keyart-9x16.png",
+    "atelier-lab-16x9.png"
+  ],
+  "surreal_moves": [
+    "infinite_runway",
+    "audience_of_heads",
+    "inverted_atelier"
+  ],
+  "palette": "strict monochrome per zone"
 }
