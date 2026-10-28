@@ -2,7 +2,7 @@
   "objects": 107,
   "lights": 21,
   "materials": 43,
-  "triangles": 110372,
+  "triangles": 111456,
   "budget_triangles_max": 150000,
   "within_budget": true,
   "reference_matched": [
